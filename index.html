@@ -274,7 +274,7 @@
         </tr>
       </thead>
       <tbody id="tbody">
-        <tr data-env="uat" data-hours="1">
+        <tr data-env="uat" data-time="10:30" data-days="0">
           <td class="chg-id">CHG89357</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Frontend Service</td>
@@ -283,7 +283,7 @@
           <td class="time-ago"></td>
           <td class="desc">Testing mobile responsive layout improvements for product pages. Validates cross-browser compatibility before production release.</td>
         </tr>
-        <tr data-env="uat" data-hours="2">
+        <tr data-env="uat" data-time="09:15" data-days="0">
           <td class="chg-id">CHG89355</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Ad Service</td>
@@ -292,7 +292,7 @@
           <td class="time-ago"></td>
           <td class="desc">Testing new ad placement algorithm for homepage banner. Validates impression tracking and click-through rate measurements before production rollout.</td>
         </tr>
-        <tr data-env="prod" data-hours="7">
+        <tr data-env="prod" data-time="04:00" data-days="0">
           <td class="chg-id">CHG89351</td>
           <td><span class="env-badge prod">PROD</span></td>
           <td>Checkout Service</td>
@@ -301,7 +301,7 @@
           <td class="time-ago"></td>
           <td class="desc">Promoted UAT changes to production. Enhanced payment validation logic and added a retry mechanism for transient payment gateway failures.</td>
         </tr>
-        <tr data-env="uat" data-hours="8">
+        <tr data-env="uat" data-time="03:30" data-days="0">
           <td class="chg-id">CHG89348</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Checkout Service</td>
@@ -310,7 +310,7 @@
           <td class="time-ago"></td>
           <td class="desc">Final UAT testing of enhanced payment validation logic. Includes retry mechanism for payment gateway timeouts and improved error messaging.</td>
         </tr>
-        <tr data-env="prod" data-hours="22">
+        <tr data-env="prod" data-time="23:00" data-days="1">
           <td class="chg-id">CHG89342</td>
           <td><span class="env-badge prod">PROD</span></td>
           <td>Cart Service</td>
@@ -319,7 +319,7 @@
           <td class="time-ago"></td>
           <td class="desc">Promoted UAT changes to production. Added business metric logging for cart operations and improved session handling for better performance tracking.</td>
         </tr>
-        <tr data-env="uat" data-hours="24">
+        <tr data-env="uat" data-time="09:00" data-days="1">
           <td class="chg-id">CHG89340</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Cart Service</td>
@@ -360,10 +360,12 @@
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  const now = new Date();
-  document.querySelectorAll('#tbody tr[data-hours]').forEach(row => {
-    const hours = parseInt(row.dataset.hours, 10);
-    const t = new Date(now.getTime() - hours * 60 * 60 * 1000);
+  document.querySelectorAll('#tbody tr[data-time]').forEach(row => {
+    const [hh, mm] = row.dataset.time.split(':').map(Number);
+    const days = parseInt(row.dataset.days, 10) || 0;
+    const t = new Date();
+    t.setDate(t.getDate() - days);
+    t.setHours(hh, mm, 0, 0);
     row.querySelector('.time-ago').textContent = fmtTimestamp(t);
   });
 
