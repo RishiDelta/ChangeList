@@ -243,8 +243,9 @@
     </div>
     <div class="sep"></div>
     <label class="toggle-wrap" onclick="toggleTheme()">
+      <span id="theme-icon" style="font-size:1.3rem;line-height:1;">☀️</span>
       <div class="toggle"></div>
-      <span id="theme-label">Light</span>
+      <span id="theme-icon-right" style="font-size:1.3rem;line-height:1;">🌙</span>
     </label>
   </div>
 </header>
@@ -300,7 +301,7 @@
           <td class="time-ago"></td>
           <td class="desc">Promoted UAT changes to production. Enhanced payment validation logic and added a retry mechanism for transient payment gateway failures.</td>
         </tr>
-        <tr data-env="uat" data-time="03:30" data-days="0">
+        <tr data-env="uat" data-time="21:30" data-days="1">
           <td class="chg-id">CHG89348</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Checkout Service</td>
@@ -359,10 +360,7 @@
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  // Deployment window: 08:00 – 01:00 (next calendar day)
-  // A time is within the window if hour >= 8 OR hour < 1
-  function inDeployWindow(h) { return h >= 8 || h < 1; }
-
+  // Show a change only if its timestamp is in the past (already deployed)
   const now2 = new Date();
   let visibleCount = 0;
 
@@ -373,14 +371,7 @@
     t.setDate(t.getDate() - days);
     t.setHours(hh, mm, 0, 0);
 
-    // Hide if the change time is still in the future
     if (t > now2) {
-      row.classList.add('hidden');
-      return;
-    }
-
-    // Hide if outside the 08:00–01:00 deployment window
-    if (!inDeployWindow(hh)) {
       row.classList.add('hidden');
       return;
     }
@@ -392,19 +383,33 @@
   document.getElementById('row-count').textContent = `${visibleCount} change${visibleCount !== 1 ? 's' : ''}`;
 
   // ── Theme toggle ──
+  function applyThemeIcons(theme) {
+    const sun  = document.getElementById('theme-icon');
+    const moon = document.getElementById('theme-icon-right');
+    if (theme === 'dark') {
+      sun.style.opacity  = '0.35';
+      moon.style.opacity = '1';
+    } else {
+      sun.style.opacity  = '1';
+      moon.style.opacity = '0.35';
+    }
+  }
+
   function toggleTheme() {
     const html = document.documentElement;
     const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
-    document.getElementById('theme-label').textContent = next === 'dark' ? 'Light' : 'Dark';
     localStorage.setItem('cdash_theme', next);
+    applyThemeIcons(next);
   }
 
   // Restore saved theme
   const savedTheme = localStorage.getItem('cdash_theme');
   if (savedTheme) {
     document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('theme-label').textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+    applyThemeIcons(savedTheme);
+  } else {
+    applyThemeIcons('dark');
   }
 
   // ── Filter ──
