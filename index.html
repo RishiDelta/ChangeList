@@ -243,9 +243,8 @@
     </div>
     <div class="sep"></div>
     <label class="toggle-wrap" onclick="toggleTheme()">
-      <span id="theme-icon" style="font-size:1.3rem;line-height:1;">☀️</span>
       <div class="toggle"></div>
-      <span id="theme-icon-right" style="font-size:1.3rem;line-height:1;">🌙</span>
+      <span id="theme-label">Light</span>
     </label>
   </div>
 </header>
@@ -360,56 +359,32 @@
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  // Show a change only if its timestamp is in the past (already deployed)
-  const now2 = new Date();
-  let visibleCount = 0;
-
+  // All changes are already deployed — show all, just compute the display timestamp
   document.querySelectorAll('#tbody tr[data-time]').forEach(row => {
     const [hh, mm] = row.dataset.time.split(':').map(Number);
     const days = parseInt(row.dataset.days, 10) || 0;
     const t = new Date();
     t.setDate(t.getDate() - days);
     t.setHours(hh, mm, 0, 0);
-
-    if (t > now2) {
-      row.classList.add('hidden');
-      return;
-    }
-
     row.querySelector('.time-ago').textContent = fmtTimestamp(t);
-    visibleCount++;
   });
 
-  document.getElementById('row-count').textContent = `${visibleCount} change${visibleCount !== 1 ? 's' : ''}`;
+  document.getElementById('row-count').textContent = '6 changes';
 
   // ── Theme toggle ──
-  function applyThemeIcons(theme) {
-    const sun  = document.getElementById('theme-icon');
-    const moon = document.getElementById('theme-icon-right');
-    if (theme === 'dark') {
-      sun.style.opacity  = '0.35';
-      moon.style.opacity = '1';
-    } else {
-      sun.style.opacity  = '1';
-      moon.style.opacity = '0.35';
-    }
-  }
-
   function toggleTheme() {
     const html = document.documentElement;
     const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
+    document.getElementById('theme-label').textContent = next === 'dark' ? 'Light' : 'Dark';
     localStorage.setItem('cdash_theme', next);
-    applyThemeIcons(next);
   }
 
   // Restore saved theme
   const savedTheme = localStorage.getItem('cdash_theme');
   if (savedTheme) {
     document.documentElement.setAttribute('data-theme', savedTheme);
-    applyThemeIcons(savedTheme);
-  } else {
-    applyThemeIcons('dark');
+    document.getElementById('theme-label').textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
   }
 
   // ── Filter ──
