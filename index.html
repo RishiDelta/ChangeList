@@ -222,6 +222,25 @@
     .time-ago { white-space: nowrap; color: var(--muted); font-size: 0.9rem; }
     .desc { font-size: 0.9rem; color: var(--muted); max-width: 340px; }
 
+    /* Scheduled row styling */
+    tbody tr.scheduled { opacity: 0.75; }
+
+    .sched-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-left: 6px;
+      background: rgba(210,153,34,0.15);
+      color: #e3a008;
+      vertical-align: middle;
+    }
+
+    .time-ago.scheduled-time { color: #e3a008; }
+
     .empty-row { display: none; text-align: center; color: var(--muted); font-size: 0.85rem; padding: 32px; }
   </style>
 </head>
@@ -354,33 +373,32 @@
   }, 1000);
   document.getElementById('live-time').textContent = fmt(new Date());
 
-  // ── Relative "ago" times — computed live so they stay accurate ──
-  // Record each change's deployment epoch once on page load
+  // ── Deployment / scheduled timestamps ──
+  // Positive data-hours = deployed N hours ago
+  // Negative data-hours = scheduled N hours from now
+  function fmtDeployTime(d) {
+    return `${pad(d.getDate())}:${pad(d.getMonth() + 1)}:${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
   const pageLoadTime = Date.now();
   document.querySelectorAll('#tbody tr[data-hours]').forEach(row => {
     const hours = parseInt(row.dataset.hours, 10);
-    row.dataset.deployedAt = pageLoadTime - hours * 3600 * 1000;
+    const isScheduled = hours < 0;
+    // positive hours → past; negative hours → future (scheduled)
+    const t = new Date(pageLoadTime - hours * 3600 * 1000);
+    const cell = row.querySelector('.time-ago');
+
+    if (isScheduled) {
+      row.classList.add('scheduled');
+      cell.classList.add('scheduled-time');
+      cell.textContent = fmtDeployTime(t);
+      // append "Scheduled" badge next to the Change ID
+      const idCell = row.querySelector('.chg-id');
+      idCell.insertAdjacentHTML('beforeend', '<span class="sched-badge">Scheduled</span>');
+    } else {
+      cell.textContent = fmtDeployTime(t);
+    }
   });
-
-  function agoText(deployedAt) {
-    const diffMs  = Date.now() - deployedAt;
-    const diffMin = Math.floor(diffMs / 60000);
-    if (diffMin < 1)  return 'just now';
-    if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
-    const diffHr = Math.floor(diffMin / 60);
-    if (diffHr < 24)  return `${diffHr} hour${diffHr !== 1 ? 's' : ''} ago`;
-    const diffDay = Math.floor(diffHr / 24);
-    return `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
-  }
-
-  function refreshAgo() {
-    document.querySelectorAll('#tbody tr[data-deployed-at]').forEach(row => {
-      row.querySelector('.time-ago').textContent = agoText(+row.dataset.deployedAt);
-    });
-  }
-
-  refreshAgo();
-  setInterval(refreshAgo, 60000); // refresh every minute
 
   document.getElementById('row-count').textContent = '6 changes';
 
