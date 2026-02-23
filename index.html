@@ -287,7 +287,7 @@
         </tr>
       </thead>
       <tbody id="tbody">
-        <tr data-env="uat" data-hours="1">
+        <tr data-env="uat" data-minutes="107">
           <td class="chg-id">CHG89357</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Frontend Service</td>
@@ -296,7 +296,7 @@
           <td class="time-ago"></td>
           <td class="desc">Testing mobile responsive layout improvements for product pages. Validates cross-browser compatibility before production release.</td>
         </tr>
-        <tr data-env="uat" data-hours="2">
+        <tr data-env="uat" data-minutes="131">
           <td class="chg-id">CHG89355</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Ad Service</td>
@@ -305,7 +305,7 @@
           <td class="time-ago"></td>
           <td class="desc">Testing new ad placement algorithm for homepage banner. Validates impression tracking and click-through rate measurements before production rollout.</td>
         </tr>
-        <tr data-env="prod" data-hours="7">
+        <tr data-env="prod" data-minutes="506">
           <td class="chg-id">CHG89351</td>
           <td><span class="env-badge prod">PROD</span></td>
           <td>Checkout Service</td>
@@ -314,7 +314,7 @@
           <td class="time-ago"></td>
           <td class="desc">Promoted UAT changes to production. Enhanced payment validation logic and added a retry mechanism for transient payment gateway failures.</td>
         </tr>
-        <tr data-env="uat" data-hours="8">
+        <tr data-env="uat" data-minutes="1003">
           <td class="chg-id">CHG89348</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Checkout Service</td>
@@ -323,7 +323,7 @@
           <td class="time-ago"></td>
           <td class="desc">Final UAT testing of enhanced payment validation logic. Includes retry mechanism for payment gateway timeouts and improved error messaging.</td>
         </tr>
-        <tr data-env="prod" data-hours="22">
+        <tr data-env="prod" data-minutes="561">
           <td class="chg-id">CHG89342</td>
           <td><span class="env-badge prod">PROD</span></td>
           <td>Cart Service</td>
@@ -332,7 +332,7 @@
           <td class="time-ago"></td>
           <td class="desc">Promoted UAT changes to production. Added business metric logging for cart operations and improved session handling for better performance tracking.</td>
         </tr>
-        <tr data-env="uat" data-hours="24">
+        <tr data-env="uat" data-minutes="1403">
           <td class="chg-id">CHG89340</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Cart Service</td>
@@ -361,8 +361,6 @@
   const openedAt = stored ? new Date(+stored) : new Date();
   if (!stored) sessionStorage.setItem(KEY, openedAt.getTime());
 
-  document.getElementById('session-time').textContent = fmt(openedAt);
-
   setInterval(() => {
     document.getElementById('live-time').textContent = fmt(new Date());
   }, 1000);
@@ -376,20 +374,20 @@
   }
 
   const pageLoadTime = Date.now();
-  document.querySelectorAll('#tbody tr[data-hours]').forEach(row => {
-    const hours = parseInt(row.dataset.hours, 10);
-    const isScheduled = hours < 0;
-    // positive hours → past; negative hours → future (scheduled)
-    const t = new Date(pageLoadTime - hours * 3600 * 1000);
+
+  // Positive data-minutes = deployed N minutes ago
+  // Negative data-minutes = scheduled N minutes from now
+  document.querySelectorAll('#tbody tr[data-minutes]').forEach(row => {
+    const mins = parseInt(row.dataset.minutes, 10);
+    const isScheduled = mins < 0;
+    const t = new Date(pageLoadTime - mins * 60 * 1000);
     const cell = row.querySelector('.time-ago');
 
     if (isScheduled) {
       row.classList.add('scheduled');
       cell.classList.add('scheduled-time');
       cell.textContent = fmtDeployTime(t);
-      // append "Scheduled" badge next to the Change ID
-      const idCell = row.querySelector('.chg-id');
-      idCell.insertAdjacentHTML('beforeend', '<span class="sched-badge">Scheduled</span>');
+      row.querySelector('.chg-id').insertAdjacentHTML('beforeend', '<span class="sched-badge">Scheduled</span>');
     } else {
       cell.textContent = fmtDeployTime(t);
     }
