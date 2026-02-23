@@ -287,7 +287,7 @@
           <th>Service</th>
           <th>Owner</th>
           <th>Version</th>
-          <th>Time of Change</th>
+          <th>Timestamp</th>
           <th>Description</th>
         </tr>
       </thead>
@@ -377,7 +377,7 @@
   // Positive data-hours = deployed N hours ago
   // Negative data-hours = scheduled N hours from now
   function fmtDeployTime(d) {
-    return `${pad(d.getDate())}:${pad(d.getMonth() + 1)}:${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    return `${pad(d.getDate())}:${pad(d.getMonth() + 1)}:${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
   const pageLoadTime = Date.now();
