@@ -354,19 +354,33 @@
   }, 1000);
   document.getElementById('live-time').textContent = fmt(new Date());
 
-  // ── "X hours ago" labels ──
-  function agoText(hours) {
-    if (hours < 1)  return 'just now';
-    if (hours === 1) return '1 hour ago';
-    if (hours < 24) return `${hours} hours ago`;
-    const days = Math.round(hours / 24);
-    return days === 1 ? '1 day ago' : `${days} days ago`;
-  }
-
+  // ── Relative "ago" times — computed live so they stay accurate ──
+  // Record each change's deployment epoch once on page load
+  const pageLoadTime = Date.now();
   document.querySelectorAll('#tbody tr[data-hours]').forEach(row => {
     const hours = parseInt(row.dataset.hours, 10);
-    row.querySelector('.time-ago').textContent = agoText(hours);
+    row.dataset.deployedAt = pageLoadTime - hours * 3600 * 1000;
   });
+
+  function agoText(deployedAt) {
+    const diffMs  = Date.now() - deployedAt;
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1)  return 'just now';
+    if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24)  return `${diffHr} hour${diffHr !== 1 ? 's' : ''} ago`;
+    const diffDay = Math.floor(diffHr / 24);
+    return `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
+  }
+
+  function refreshAgo() {
+    document.querySelectorAll('#tbody tr[data-deployed-at]').forEach(row => {
+      row.querySelector('.time-ago').textContent = agoText(+row.dataset.deployedAt);
+    });
+  }
+
+  refreshAgo();
+  setInterval(refreshAgo, 60000); // refresh every minute
 
   document.getElementById('row-count').textContent = '6 changes';
 
