@@ -36,7 +36,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       min-height: 100vh;
     }
 
@@ -138,8 +138,8 @@
       border-radius: 6px;
       color: var(--muted);
       cursor: pointer;
-      font-size: 0.78rem;
-      padding: 5px 12px;
+      font-size: 0.88rem;
+      padding: 6px 14px;
       transition: all 0.15s;
     }
 
@@ -171,7 +171,7 @@
     th {
       text-align: left;
       padding: 10px 14px;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.6px;
@@ -198,17 +198,17 @@
     /* ── Cell styles ── */
     .chg-id {
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 1rem;
       white-space: nowrap;
     }
 
     .env-badge {
       display: inline-block;
-      font-size: 0.68rem;
+      font-size: 0.8rem;
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      padding: 2px 8px;
+      padding: 3px 10px;
       border-radius: 20px;
       white-space: nowrap;
     }
@@ -219,9 +219,9 @@
     [data-theme="light"] .env-badge.prod { background: rgba(207,34,46,0.1); }
     [data-theme="light"] .env-badge.uat  { background: rgba(9,105,218,0.1); }
 
-    .version { font-family: monospace; font-size: 0.8rem; color: var(--muted); }
-    .time-ago { white-space: nowrap; color: var(--muted); font-size: 0.82rem; }
-    .desc { font-size: 0.82rem; color: var(--muted); max-width: 340px; }
+    .version { font-family: monospace; font-size: 0.9rem; color: var(--muted); }
+    .time-ago { white-space: nowrap; color: var(--muted); font-size: 0.9rem; }
+    .desc { font-size: 0.9rem; color: var(--muted); max-width: 340px; }
 
     .empty-row { display: none; text-align: center; color: var(--muted); font-size: 0.85rem; padding: 32px; }
   </style>
@@ -269,63 +269,63 @@
           <th>Service</th>
           <th>Owner</th>
           <th>Version</th>
-          <th>When</th>
+          <th>Timestamp</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody id="tbody">
-        <tr data-env="uat">
+        <tr data-env="uat" data-hours="1">
           <td class="chg-id">CHG89357</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Frontend Service</td>
           <td>Shay</td>
           <td class="version">v2.1.6</td>
-          <td class="time-ago">1 hr ago</td>
+          <td class="time-ago"></td>
           <td class="desc">Testing mobile responsive layout improvements for product pages. Validates cross-browser compatibility before production release.</td>
         </tr>
-        <tr data-env="uat">
+        <tr data-env="uat" data-hours="2">
           <td class="chg-id">CHG89355</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Ad Service</td>
           <td>Daniel</td>
           <td class="version">v1.4.2</td>
-          <td class="time-ago">2 hrs ago</td>
+          <td class="time-ago"></td>
           <td class="desc">Testing new ad placement algorithm for homepage banner. Validates impression tracking and click-through rate measurements before production rollout.</td>
         </tr>
-        <tr data-env="prod">
+        <tr data-env="prod" data-hours="7">
           <td class="chg-id">CHG89351</td>
           <td><span class="env-badge prod">PROD</span></td>
           <td>Checkout Service</td>
           <td>Daniel</td>
           <td class="version">v1.8.2</td>
-          <td class="time-ago">7 hrs ago</td>
+          <td class="time-ago"></td>
           <td class="desc">Promoted UAT changes to production. Enhanced payment validation logic and added a retry mechanism for transient payment gateway failures.</td>
         </tr>
-        <tr data-env="uat">
+        <tr data-env="uat" data-hours="8">
           <td class="chg-id">CHG89348</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Checkout Service</td>
           <td>Daniel</td>
           <td class="version">v1.8.2</td>
-          <td class="time-ago">8 hrs ago</td>
+          <td class="time-ago"></td>
           <td class="desc">Final UAT testing of enhanced payment validation logic. Includes retry mechanism for payment gateway timeouts and improved error messaging.</td>
         </tr>
-        <tr data-env="prod">
+        <tr data-env="prod" data-hours="22">
           <td class="chg-id">CHG89342</td>
           <td><span class="env-badge prod">PROD</span></td>
           <td>Cart Service</td>
           <td>Shay</td>
           <td class="version">v1.2.3</td>
-          <td class="time-ago">22 hrs ago</td>
+          <td class="time-ago"></td>
           <td class="desc">Promoted UAT changes to production. Added business metric logging for cart operations and improved session handling for better performance tracking.</td>
         </tr>
-        <tr data-env="uat">
+        <tr data-env="uat" data-hours="24">
           <td class="chg-id">CHG89340</td>
           <td><span class="env-badge uat">UAT</span></td>
           <td>Cart Service</td>
           <td>Shay</td>
           <td class="version">v1.2.3</td>
-          <td class="time-ago">24 hrs ago</td>
+          <td class="time-ago"></td>
           <td class="desc">Testing business metric logging for cart add/remove operations. Preparing for production deployment after successful UAT validation.</td>
         </tr>
         <tr class="empty-row" id="empty-row">
@@ -354,6 +354,18 @@
     document.getElementById('live-time').textContent = fmt(new Date());
   }, 1000);
   document.getElementById('live-time').textContent = fmt(new Date());
+
+  // ── Timestamps in change list ──
+  function fmtTimestamp(d) {
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  const now = new Date();
+  document.querySelectorAll('#tbody tr[data-hours]').forEach(row => {
+    const hours = parseInt(row.dataset.hours, 10);
+    const t = new Date(now.getTime() - hours * 60 * 60 * 1000);
+    row.querySelector('.time-ago').textContent = fmtTimestamp(t);
+  });
 
   // ── Theme toggle ──
   function toggleTheme() {
