@@ -44,40 +44,39 @@
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 14px 24px;
+      padding: 22px 36px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
     .header-left {
-      font-size: 1rem;
+      font-size: 1.5rem;
       font-weight: 700;
-      letter-spacing: -0.2px;
+      letter-spacing: -0.3px;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 28px;
       flex-wrap: wrap;
     }
 
     .clocks {
       display: flex;
       align-items: center;
-      gap: 16px;
-      font-size: 0.8rem;
+      gap: 24px;
     }
 
     .clock-item { display: flex; flex-direction: column; align-items: flex-end; }
-    .clock-label { color: var(--muted); font-size: 0.68rem; margin-bottom: 1px; }
-    .clock-value { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .clock-label { color: var(--muted); font-size: 0.8rem; margin-bottom: 3px; }
+    .clock-value { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 1.9rem; }
     .clock-value.session { color: #3fb950; }
 
-    .sep { width: 1px; height: 28px; background: var(--border); }
+    .sep { width: 1px; height: 52px; background: var(--border); }
 
     /* ── Theme toggle ── */
     .toggle-wrap {
@@ -292,7 +291,7 @@
           <td class="time-ago"></td>
           <td class="desc">Testing new ad placement algorithm for homepage banner. Validates impression tracking and click-through rate measurements before production rollout.</td>
         </tr>
-        <tr data-env="prod" data-time="04:00" data-days="0">
+        <tr data-env="prod" data-time="09:00" data-days="0">
           <td class="chg-id">CHG89351</td>
           <td><span class="env-badge prod">PROD</span></td>
           <td>Checkout Service</td>
@@ -360,14 +359,37 @@
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
+  // Deployment window: 08:00 – 01:00 (next calendar day)
+  // A time is within the window if hour >= 8 OR hour < 1
+  function inDeployWindow(h) { return h >= 8 || h < 1; }
+
+  const now2 = new Date();
+  let visibleCount = 0;
+
   document.querySelectorAll('#tbody tr[data-time]').forEach(row => {
     const [hh, mm] = row.dataset.time.split(':').map(Number);
     const days = parseInt(row.dataset.days, 10) || 0;
     const t = new Date();
     t.setDate(t.getDate() - days);
     t.setHours(hh, mm, 0, 0);
+
+    // Hide if the change time is still in the future
+    if (t > now2) {
+      row.classList.add('hidden');
+      return;
+    }
+
+    // Hide if outside the 08:00–01:00 deployment window
+    if (!inDeployWindow(hh)) {
+      row.classList.add('hidden');
+      return;
+    }
+
     row.querySelector('.time-ago').textContent = fmtTimestamp(t);
+    visibleCount++;
   });
+
+  document.getElementById('row-count').textContent = `${visibleCount} change${visibleCount !== 1 ? 's' : ''}`;
 
   // ── Theme toggle ──
   function toggleTheme() {
