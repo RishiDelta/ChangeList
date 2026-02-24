@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Change Management — Change Requests</title>
+  <style>
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('../fonts/poppins-400.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 600;
+      font-display: swap;
+      src: url('../fonts/poppins-600.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+      src: url('../fonts/poppins-700.woff2') format('woff2');
+    }
+    :root[data-theme="light"] {
+      --top-nav:        #1b3a57;
+      --bg:             #f0f2f5;
+      --surface:        #ffffff;
+      --border:         #d1d5db;
+      --text:           #1a1a2e;
+      --muted:          #6b7280;
+      --th-bg:          #e8eef4;
+      --row-alt:        #f8fbff;
+      --row-hover:      #daeeff;
+      --link:           #1074c4;
+      --panel-hdr:      #1f6bab;
+      --panel-hdr-text: #ffffff;
+      --prod-bg:        #d4edda;
+      --prod-fg:        #155724;
+      --uat-bg:         #cce5ff;
+      --uat-fg:         #004085;
+      --sched-bg:       #fff3cd;
+      --sched-fg:       #856404;
+      --toggle-bg:      rgba(255,255,255,0.2);
+      --status-done-bg:  #d4edda; --status-done-fg:  #155724;
+      --status-prog-bg:  #cce5ff; --status-prog-fg:  #004085;
+      --status-sched-bg: #fff3cd; --status-sched-fg: #856404;
+    }
+
+    :root[data-theme="dark"] {
+      --top-nav:        #0d1b2a;
+      --bg:             #0f172a;
+      --surface:        #1e293b;
+      --border:         #334155;
+      --text:           #e2e8f0;
+      --muted:          #94a3b8;
+      --th-bg:          #243447;
+      --row-alt:        #162032;
+      --row-hover:      #1e3a52;
+      --link:           #60a5fa;
+      --panel-hdr:      #1e4976;
+      --panel-hdr-text: #ffffff;
+      --prod-bg:        rgba(21,87,36,0.35);
+      --prod-fg:        #6ee38d;
+      --uat-bg:         rgba(0,64,133,0.35);
+      --uat-fg:         #93c5fd;
+      --sched-bg:       rgba(133,100,4,0.35);
+      --sched-fg:       #fcd34d;
+      --toggle-bg:      rgba(255,255,255,0.15);
+      --status-done-bg:  rgba(21,87,36,0.35);  --status-done-fg:  #6ee38d;
+      --status-prog-bg:  rgba(0,64,133,0.35);  --status-prog-fg:  #93c5fd;
+      --status-sched-bg: rgba(133,100,4,0.35); --status-sched-fg: #fcd34d;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: 1.1rem;
+      min-height: 100vh;
+    }
+
+    /* ── Top navigation bar ── */
+    .top-nav {
+      background: var(--top-nav);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 14px; }
+
+    .ob-logo {
+      height: 42px;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .nav-vdivider {
+      width: 1px; height: 28px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .nav-module {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.1rem;
+      font-family: 'Poppins', sans-serif;
+      font-style: normal;
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 18px; }
+
+    .nav-clock {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.5px;
+      font-family: 'Poppins', sans-serif;
+      font-style: normal;
+    }
+
+    /* Theme toggle */
+    .toggle-wrap {
+      display: flex; align-items: center; gap: 6px;
+      cursor: pointer; user-select: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      font-style: normal;
+    }
+
+    .toggle {
+      width: 32px; height: 18px;
+      background: var(--toggle-bg);
+      border-radius: 18px;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: white;
+      transition: transform 0.2s;
+    }
+
+    [data-theme="light"] .toggle::after { transform: translateX(14px); }
+
+    /* ── Main content ── */
+    .content { padding: 16px 20px; }
+
+    /* ── Panel (list view) ── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .panel-header {
+      background: var(--panel-hdr);
+      color: var(--panel-hdr-text);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-count {
+      font-size: 1rem;
+      background: rgba(255,255,255,0.2);
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-weight: 400;
+    }
+
+    .panel-filters { display: flex; align-items: center; gap: 6px; }
+
+    .filter-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 3px;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      cursor: pointer;
+      transition: opacity 0.15s, background 0.15s;
+    }
+
+    .filter-btn:hover  { background: rgba(255,255,255,0.22); }
+    .filter-btn.active { background: rgba(255,255,255,0.3); color: #fff; font-weight: 600; border-color: rgba(255,255,255,0.5); }
+
+    .filter-btn.prod         { background: var(--prod-bg); color: var(--prod-fg); border-color: var(--prod-fg); opacity: 0.85; }
+    .filter-btn.prod:hover   { opacity: 1; }
+    .filter-btn.prod.active  { background: var(--prod-bg); color: var(--prod-fg); border-color: var(--prod-fg); opacity: 1; font-weight: 700; }
+
+    .filter-btn.uat          { background: var(--uat-bg);  color: var(--uat-fg);  border-color: var(--uat-fg);  opacity: 0.85; }
+    .filter-btn.uat:hover    { opacity: 1; }
+    .filter-btn.uat.active   { background: var(--uat-bg);  color: var(--uat-fg);  border-color: var(--uat-fg);  opacity: 1; font-weight: 700; }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    thead tr {
+      background: var(--th-bg);
+      border-bottom: 2px solid var(--border);
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      border-right: 1px solid var(--border);
+    }
+
+    th:last-child { border-right: none; }
+
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+
+    td:last-child { border-right: none; }
+
+    tbody tr:nth-child(even) { background: var(--row-alt); }
+    tbody tr:hover { background: var(--row-hover); cursor: default; }
+    tbody tr.hidden { display: none; }
+    tbody tr.scheduled { background: var(--sched-bg) !important; }
+
+    /* ── Cell types ── */
+    .row-num {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+      width: 30px;
+      padding: 9px 4px !important;
+      border-right: 1px solid var(--border);
+    }
+
+    .chg-id {
+      color: var(--text);
+      font-weight: 600;
+      white-space: nowrap;
+      font-size: 0.9rem;
+    }
+
+    .state-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .state-badge.prod  { background: var(--prod-bg);  color: var(--prod-fg);  }
+    .state-badge.uat   { background: var(--uat-bg);   color: var(--uat-fg);   }
+    .state-badge.sched { background: var(--sched-bg); color: var(--sched-fg); border: 1px solid var(--sched-fg); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .status-badge.done  { background: var(--status-done-bg);  color: var(--status-done-fg);  }
+    .status-badge.prog  { background: var(--status-prog-bg);  color: var(--status-prog-fg);  }
+    .status-badge.sched { background: var(--status-sched-bg); color: var(--status-sched-fg); border: 1px solid var(--status-sched-fg); }
+
+    .version { font-family: "SFMono-Regular", Consolas, monospace; color: var(--muted); font-size: 0.9rem; }
+
+    .ts-cell { white-space: nowrap; color: var(--muted); font-size: 0.9rem; }
+    .ts-cell.scheduled-time { color: var(--sched-fg); font-weight: 600; }
+
+    .desc-cell { color: var(--text); max-width: 300px; font-size: 0.9rem; }
+
+    .empty-row { display: none; }
+    .empty-row td {
+      text-align: center;
+      color: var(--muted);
+      padding: 32px;
+      font-size: 1.1rem;
+      border-right: none;
+    }
+
+    /* ── Footer info bar ── */
+    .info-bar {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: var(--muted);
+      text-align: right;
+      padding: 0 4px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <img src="../logo.svg" class="ob-logo" alt="Online Boutique" />
+    <div class="nav-vdivider"></div>
+    <span class="nav-module">Change Management</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-clock" id="live-time">—</span>
+    <label class="toggle-wrap" onclick="toggleTheme()">
+      <div class="toggle"></div>
+      <span id="theme-label">Dark</span>
+    </label>
+  </div>
+</nav>
+
+<!-- Content -->
+<div class="content">
+  <div class="panel">
+
+    <div class="panel-header">
+      <div class="panel-title">
+        Change Requests
+        <span class="panel-count" id="row-count">6 records</span>
+      </div>
+      <div class="panel-filters">
+        <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn prod"   onclick="setFilter('prod', this)">PROD</button>
+        <button class="filter-btn uat"    onclick="setFilter('uat', this)">UAT</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30px"></th>
+          <th>#Number</th>
+          <th>Environment</th>
+          <th>Service</th>
+          <th>Assigned To</th>
+          <th>Version</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Short Description</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+
+        <tr data-env="uat" data-minutes="107">
+          <td class="row-num">1</td>
+          <td><span class="chg-id">CHG89357</span></td>
+          <td><span class="state-badge uat">UAT</span></td>
+          <td>Frontend Service</td>
+          <td>Shay</td>
+          <td class="version">v2.1.6</td>
+          <td class="ts-cell time-ago"></td>
+          <td class="ts-cell planned-end"></td>
+          <td class="desc-cell">Testing mobile responsive layout improvements for product pages. Validates cross-browser compatibility before production release.</td>
+        </tr>
+
+        <tr data-env="uat" data-minutes="131">
+          <td class="row-num">2</td>
+          <td><span class="chg-id">CHG89355</span></td>
+          <td><span class="state-badge uat">UAT</span></td>
+          <td>Ad Service</td>
+          <td>Daniel</td>
+          <td class="version">v1.4.2</td>
+          <td class="ts-cell time-ago"></td>
+          <td class="ts-cell planned-end"></td>
+          <td class="desc-cell">Testing new ad placement algorithm for homepage banner. Validates impression tracking and click-through rate measurements before production rollout.</td>
+        </tr>
+
+        <tr data-env="prod" data-minutes="506">
+          <td class="row-num">3</td>
+          <td><span class="chg-id">CHG89351</span></td>
+          <td><span class="state-badge prod">PROD</span></td>
+          <td>Checkout Service</td>
+          <td>Daniel</td>
+          <td class="version">v1.8.2</td>
+          <td class="ts-cell time-ago"></td>
+          <td class="ts-cell planned-end"></td>
+          <td class="desc-cell">Promoted UAT changes to production. Enhanced payment validation logic and added a retry mechanism for transient payment gateway failures.</td>
+        </tr>
+
+        <tr data-env="uat" data-minutes="1003">
+          <td class="row-num">4</td>
+          <td><span class="chg-id">CHG89348</span></td>
+          <td><span class="state-badge uat">UAT</span></td>
+          <td>Checkout Service</td>
+          <td>Daniel</td>
+          <td class="version">v1.8.2</td>
+          <td class="ts-cell time-ago"></td>
+          <td class="ts-cell planned-end"></td>
+          <td class="desc-cell">Final UAT testing of enhanced payment validation logic. Includes retry mechanism for payment gateway timeouts and improved error messaging.</td>
+        </tr>
+
+        <tr data-env="prod" data-minutes="561">
+          <td class="row-num">5</td>
+          <td><span class="chg-id">CHG89342</span></td>
+          <td><span class="state-badge prod">PROD</span></td>
+          <td>Cart Service</td>
+          <td>Shay</td>
+          <td class="version">v1.2.3</td>
+          <td class="ts-cell time-ago"></td>
+          <td class="ts-cell planned-end"></td>
+          <td class="desc-cell">Promoted UAT changes to production. Added business metric logging for cart operations and improved session handling for better performance tracking.</td>
+        </tr>
+
+        <tr data-env="uat" data-minutes="1403">
+          <td class="row-num">6</td>
+          <td><span class="chg-id">CHG89340</span></td>
+          <td><span class="state-badge uat">UAT</span></td>
+          <td>Cart Service</td>
+          <td>Shay</td>
+          <td class="version">v1.2.3</td>
+          <td class="ts-cell time-ago"></td>
+          <td class="ts-cell planned-end"></td>
+          <td class="desc-cell">Testing business metric logging for cart add/remove operations. Preparing for production deployment after successful UAT validation.</td>
+        </tr>
+
+        <tr class="empty-row" id="empty-row">
+          <td colspan="9">No records found.</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-bar" id="info-bar"></div>
+</div>
+
+<script>
+  // ── Reference time (localStorage, 2-hour TTL) ──
+  const KEY = 'cdash_opened';
+  const TTL = 2 * 60 * 60 * 1000; // 2 hours in ms
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function fmt(d) {
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  const stored = localStorage.getItem(KEY);
+  const storedTime = stored ? +stored : null;
+  const isExpired = !storedTime || (Date.now() - storedTime > TTL);
+  const openedAt = isExpired ? new Date() : new Date(storedTime);
+  if (isExpired) localStorage.setItem(KEY, openedAt.getTime());
+
+  // Live clock
+  setInterval(() => {
+    document.getElementById('live-time').textContent = fmt(new Date());
+  }, 1000);
+  document.getElementById('live-time').textContent = fmt(new Date());
+
+  // ── Timestamps ──
+  function fmtDeployTime(d) {
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  // Deterministic seeded random (0–1) based on seed value
+  function seededRand(seed) {
+    const x = Math.sin(seed * 9301 + 49297) * 233280;
+    return x - Math.floor(x);
+  }
+
+  // Positive data-minutes = deployed N minutes ago
+  // Negative data-minutes = scheduled N minutes from now
+  document.querySelectorAll('#tbody tr[data-minutes]').forEach((row, idx) => {
+    const mins = parseInt(row.dataset.minutes, 10);
+    const isScheduled = mins < 0;
+    const deployStart = new Date(openedAt.getTime() - mins * 60 * 1000);
+
+    // ── Planned Start ──
+    const startCell = row.querySelector('.time-ago');
+    if (isScheduled) {
+      startCell.classList.add('scheduled-time');
+    }
+    startCell.textContent = fmtDeployTime(deployStart);
+
+    // ── Planned End (deployStart + seeded random 10–60 min, multiples of 5) ──
+    const randVal = seededRand(mins + idx * 137);
+    const extraMins = (Math.floor(randVal * 11) + 2) * 5; // 2..12 * 5 = 10..60
+    const deployEnd = new Date(deployStart.getTime() + extraMins * 60 * 1000);
+    row.querySelector('.planned-end').textContent = fmtDeployTime(deployEnd);
+
+    // Scheduled row styling
+    if (isScheduled) {
+      row.classList.add('scheduled');
+      const envBadge = row.querySelector('.state-badge');
+      envBadge.className = 'state-badge sched';
+      envBadge.textContent = 'Scheduled';
+    }
+  });
+
+  // ── Filter ──
+  function setFilter(filter, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const rows = document.querySelectorAll('#tbody tr[data-env]');
+    let count = 0;
+    rows.forEach(row => {
+      const show = filter === 'all' || row.dataset.env === filter;
+      row.classList.toggle('hidden', !show);
+      if (show) count++;
+    });
+
+    document.getElementById('empty-row').style.display = count === 0 ? 'table-row' : 'none';
+    document.getElementById('row-count').textContent = `${count} record${count !== 1 ? 's' : ''}`;
+  }
+
+  // ── Theme toggle ──
+  function toggleTheme() {
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    document.getElementById('theme-label').textContent = next === 'dark' ? 'Dark' : 'Light';
+    localStorage.setItem('cdash_theme', next);
+  }
+
+  const savedTheme = localStorage.getItem('cdash_theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.getElementById('theme-label').textContent = savedTheme === 'dark' ? 'Dark' : 'Light';
+  }
+</script>
+
+</body>
+</html>
