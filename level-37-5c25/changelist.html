@@ -381,8 +381,7 @@
           <th>Service</th>
           <th>Assigned To</th>
           <th>Version</th>
-          <th>Start</th>
-          <th>End</th>
+          <th>Time</th>
           <th>Short Description</th>
         </tr>
       </thead>
@@ -396,7 +395,7 @@
           <td>Shay</td>
           <td class="version">v2.1.6</td>
           <td class="ts-cell time-ago"></td>
-          <td class="ts-cell planned-end"></td>
+
           <td class="desc-cell">Testing mobile responsive layout improvements for product pages. Validates cross-browser compatibility before production release.</td>
         </tr>
 
@@ -408,7 +407,7 @@
           <td>Daniel</td>
           <td class="version">v1.4.2</td>
           <td class="ts-cell time-ago"></td>
-          <td class="ts-cell planned-end"></td>
+
           <td class="desc-cell">Testing new ad placement algorithm for homepage banner. Validates impression tracking and click-through rate measurements before production rollout.</td>
         </tr>
 
@@ -420,7 +419,7 @@
           <td>Daniel</td>
           <td class="version">v1.8.2</td>
           <td class="ts-cell time-ago"></td>
-          <td class="ts-cell planned-end"></td>
+
           <td class="desc-cell">Promoted UAT changes to production. Enhanced payment validation logic and added a retry mechanism for transient payment gateway failures.</td>
         </tr>
 
@@ -432,7 +431,7 @@
           <td>Daniel</td>
           <td class="version">v1.8.2</td>
           <td class="ts-cell time-ago"></td>
-          <td class="ts-cell planned-end"></td>
+
           <td class="desc-cell">Final UAT testing of enhanced payment validation logic. Includes retry mechanism for payment gateway timeouts and improved error messaging.</td>
         </tr>
 
@@ -444,7 +443,7 @@
           <td>Shay</td>
           <td class="version">v1.2.3</td>
           <td class="ts-cell time-ago"></td>
-          <td class="ts-cell planned-end"></td>
+
           <td class="desc-cell">Promoted UAT changes to production. Added business metric logging for cart operations and improved session handling for better performance tracking.</td>
         </tr>
 
@@ -456,7 +455,7 @@
           <td>Shay</td>
           <td class="version">v1.2.3</td>
           <td class="ts-cell time-ago"></td>
-          <td class="ts-cell planned-end"></td>
+
           <td class="desc-cell">Testing business metric logging for cart add/remove operations. Preparing for production deployment after successful UAT validation.</td>
         </tr>
 
@@ -518,11 +517,6 @@
     }
     startCell.textContent = fmtDeployTime(deployStart);
 
-    // ── Planned End (deployStart + seeded random 10–60 min, multiples of 5) ──
-    const randVal = seededRand(mins + idx * 137);
-    const extraMins = (Math.floor(randVal * 11) + 2) * 5; // 2..12 * 5 = 10..60
-    const deployEnd = new Date(deployStart.getTime() + extraMins * 60 * 1000);
-    row.querySelector('.planned-end').textContent = fmtDeployTime(deployEnd);
 
     // Scheduled row styling
     if (isScheduled) {
